@@ -223,12 +223,12 @@ class QuickGive_Admin {
 	public function render_text_field( $args ) {
 		$opts = get_option( self::OPTION_NAME, array() );
 		$key  = $args['key'];
-		$val  = esc_attr( $opts[ $key ] ?? '' );
+		$val  = $opts[ $key ] ?? '';
 		printf(
 			'<input type="text" class="regular-text" name="%1$s[%2$s]" id="%2$s" value="%3$s" />',
 			esc_attr( self::OPTION_NAME ),
 			esc_attr( $key ),
-			$val
+			esc_attr( $val )
 		);
 	}
 
@@ -236,12 +236,12 @@ class QuickGive_Admin {
 	public function render_password_field( $args ) {
 		$opts = get_option( self::OPTION_NAME, array() );
 		$key  = $args['key'];
-		$val  = esc_attr( $opts[ $key ] ?? '' );
+		$val  = $opts[ $key ] ?? '';
 		printf(
 			'<input type="password" class="regular-text" name="%1$s[%2$s]" id="%2$s" value="%3$s" autocomplete="new-password" />',
 			esc_attr( self::OPTION_NAME ),
 			esc_attr( $key ),
-			$val
+			esc_attr( $val )
 		);
 	}
 
@@ -251,10 +251,10 @@ class QuickGive_Admin {
 		$key  = $args['key'];
 		$val  = absint( $opts[ $key ] ?? 0 );
 		printf(
-			'<input type="number" min="0" class="small-text" name="%1$s[%2$s]" id="%2$s" value="%3$d" />',
+			'<input type="number" min="0" class="small-text" name="%1$s[%2$s]" id="%2$s" value="%3$s" />',
 			esc_attr( self::OPTION_NAME ),
 			esc_attr( $key ),
-			$val
+			esc_attr( (string) $val )
 		);
 	}
 
@@ -276,12 +276,12 @@ class QuickGive_Admin {
 	public function render_textarea_field( $args ) {
 		$opts = get_option( self::OPTION_NAME, array() );
 		$key  = $args['key'];
-		$val  = esc_textarea( $opts[ $key ] ?? '' );
+		$val  = $opts[ $key ] ?? '';
 		printf(
 			'<textarea class="large-text" rows="4" name="%1$s[%2$s]" id="%2$s">%3$s</textarea>',
 			esc_attr( self::OPTION_NAME ),
 			esc_attr( $key ),
-			$val
+			esc_textarea( $val )
 		);
 	}
 
@@ -293,12 +293,12 @@ class QuickGive_Admin {
 	public function render_email_body_field( $args ) {
 		$opts = get_option( self::OPTION_NAME, array() );
 		$key  = $args['key'];
-		$val  = esc_textarea( $opts[ $key ] ?? '' );
+		$val  = $opts[ $key ] ?? '';
 		printf(
 			'<textarea class="large-text" rows="8" name="%1$s[%2$s]" id="%2$s">%3$s</textarea>',
 			esc_attr( self::OPTION_NAME ),
 			esc_attr( $key ),
-			$val
+			esc_textarea( $val )
 		);
 		echo '<p class="description">';
 		esc_html_e( 'Available placeholders:', 'quickgive' );

@@ -96,7 +96,7 @@ class QuickGive_Logger {
 		);
 
 		if ( ! $col ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe plugin-owned table name.
 			$wpdb->query( "ALTER TABLE {$table} ADD COLUMN amount_type VARCHAR(10) NOT NULL DEFAULT 'preset' AFTER currency, ADD KEY amount_type (amount_type)" );
 		}
 
@@ -127,6 +127,7 @@ class QuickGive_Logger {
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery
 		$existing = $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe plugin-owned table name.
 			$wpdb->prepare( "SELECT id FROM {$table} WHERE reference = %s LIMIT 1", $reference )
 		);
 
@@ -182,11 +183,12 @@ class QuickGive_Logger {
 		if ( ! empty( $status ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			return (int) $wpdb->get_var(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe plugin-owned table name.
 				$wpdb->prepare( "SELECT COUNT(*) FROM {$table} WHERE status = %s", sanitize_text_field( $status ) )
 			);
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe plugin-owned table name.
 		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
 	}
 
@@ -207,7 +209,7 @@ class QuickGive_Logger {
 
 		$table = $wpdb->prefix . self::TABLE;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe plugin-owned table name.
 		$rows = $wpdb->get_results(
 			"SELECT status, COUNT(*) AS cnt FROM {$table} GROUP BY status"
 		);
@@ -245,25 +247,33 @@ class QuickGive_Logger {
 		$args = wp_parse_args( $args, $defaults );
 
 		$table  = $wpdb->prefix . self::TABLE;
-		$where  = '';
-		$values = array();
+		$limit  = absint( $args['limit'] );
+		$offset = absint( $args['offset'] );
 
 		if ( ! empty( $args['status'] ) ) {
-			$where    = 'WHERE status = %s ';
-			$values[] = sanitize_text_field( $args['status'] );
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery
+			$rows = $wpdb->get_results(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe plugin-owned table name.
+				$wpdb->prepare(
+					"SELECT * FROM {$table} WHERE status = %s ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					sanitize_text_field( $args['status'] ),
+					$limit,
+					$offset
+				)
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery
+		} else {
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery
+			$rows = $wpdb->get_results(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe plugin-owned table name.
+				$wpdb->prepare(
+					"SELECT * FROM {$table} ORDER BY created_at DESC LIMIT %d OFFSET %d",
+					$limit,
+					$offset
+				)
+			);
+			// phpcs:enable WordPress.DB.DirectDatabaseQuery
 		}
-
-		$values[] = absint( $args['limit'] );
-		$values[] = absint( $args['offset'] );
-
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-		$rows = $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM {$table} {$where}ORDER BY created_at DESC LIMIT %d OFFSET %d",
-				$values
-			)
-		);
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 		return $rows ? $rows : array();
 	}
@@ -288,6 +298,7 @@ class QuickGive_Logger {
 
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery
 		$row = $wpdb->get_row(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe plugin-owned table name.
 			"SELECT
 				COUNT(*)                                   AS total_count,
 				SUM(status = 'success')                    AS success_count,
@@ -296,6 +307,7 @@ class QuickGive_Logger {
 		);
 
 		$recent = $wpdb->get_results(
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Safe plugin-owned table name.
 			"SELECT donor_email, amount, currency, amount_type, created_at
 			 FROM {$table}
 			 WHERE status = 'success'
