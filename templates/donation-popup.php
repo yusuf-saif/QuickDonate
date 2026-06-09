@@ -1,174 +1,116 @@
 <?php
 /**
- * Donation popup modal template.
+ * Donation popup template.
  *
- * Variables available from class-quickgive-shortcode.php:
- *   @var array  $quickgive_options      Plugin settings.
- *   @var string $quickgive_button_label Donation button label.
- *   @var string $quickgive_public_key   Paystack public key (safe to include in HTML data attribute).
- *
- * This file must not be accessed directly.
- *
- * @package QuickGive
+ * @package QuickDonate
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Generate a unique ID so multiple shortcodes on a page don't conflict.
-static $quickgive_instance_count = 0;
-$quickgive_instance_count++;
-$quickgive_uid = 'qg-' . $quickgive_instance_count;
+static $quickdonate_instance_count = 0;
+$quickdonate_instance_count++;
 
-$quickgive_currency     = $quickgive_options['currency'] ?? 'NGN';
-$quickgive_allow_custom = isset( $quickgive_options['allow_custom'] ) && '1' === $quickgive_options['allow_custom'];
+$uid          = 'qd-' . $quickdonate_instance_count;
+$currency     = $settings['currency'] ?? 'NGN';
+$allow_custom = isset( $settings['allow_custom'] ) && '1' === $settings['allow_custom'];
 ?>
-<!-- QuickGive Donation Button -->
-<div class="quickgive-wrap" id="<?php echo esc_attr( $quickgive_uid . '-wrap' ); ?>">
-
+<div class="quickdonate-wrap" id="<?php echo esc_attr( $uid . '-wrap' ); ?>">
 	<button
 		type="button"
-		class="quickgive-btn"
-		id="<?php echo esc_attr( $quickgive_uid . '-trigger' ); ?>"
+		class="quickdonate-btn"
+		id="<?php echo esc_attr( $uid . '-trigger' ); ?>"
 		aria-haspopup="dialog"
-		aria-controls="<?php echo esc_attr( $quickgive_uid . '-modal' ); ?>"
+		aria-controls="<?php echo esc_attr( $uid . '-modal' ); ?>"
 	>
-		<svg class="quickgive-btn__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-			<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 12 5.09 5.5 5.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-		</svg>
-		<?php echo esc_html( $quickgive_button_label ); ?>
+		<span class="quickdonate-btn__icon" aria-hidden="true">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 12 5.09 5.5 5.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+		</span>
+		<span><?php echo esc_html( $button_label ); ?></span>
 	</button>
 
-	<!-- Modal Overlay -->
 	<div
-		class="quickgive-overlay"
-		id="<?php echo esc_attr( $quickgive_uid . '-modal' ); ?>"
+		class="quickdonate-overlay"
+		id="<?php echo esc_attr( $uid . '-modal' ); ?>"
 		role="dialog"
 		aria-modal="true"
-		aria-labelledby="<?php echo esc_attr( $quickgive_uid . '-title' ); ?>"
+		aria-labelledby="<?php echo esc_attr( $uid . '-title' ); ?>"
 		aria-hidden="true"
-		data-instance="<?php echo esc_attr( $quickgive_uid ); ?>"
-		style="display:none"
+		data-instance="<?php echo esc_attr( $uid ); ?>"
+		hidden
 	>
-		<div class="quickgive-modal" role="document">
-
-			<!-- Header -->
-			<div class="quickgive-modal__header">
-				<div class="quickgive-modal__logo" aria-hidden="true">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-						<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 12 5.09 5.5 5.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-					</svg>
+		<div class="quickdonate-modal" role="document">
+			<div class="quickdonate-modal__header">
+				<div class="quickdonate-modal__brand">
+					<div class="quickdonate-modal__logo" aria-hidden="true">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 12 5.09 5.5 5.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+					</div>
+					<div>
+						<p class="quickdonate-modal__eyebrow"><?php esc_html_e( 'QuickDonate', 'quickdonate' ); ?></p>
+						<h2 class="quickdonate-modal__title" id="<?php echo esc_attr( $uid . '-title' ); ?>"><?php esc_html_e( 'Support this work', 'quickdonate' ); ?></h2>
+						<p class="quickdonate-modal__subtitle"><?php esc_html_e( 'Choose an amount, enter your email, and complete your secure donation in a few clicks.', 'quickdonate' ); ?></p>
+					</div>
 				</div>
-				<h2 class="quickgive-modal__title" id="<?php echo esc_attr( $quickgive_uid . '-title' ); ?>">
-					<?php esc_html_e( 'Make a Donation', 'quickgive' ); ?>
-				</h2>
-				<button
-					type="button"
-					class="quickgive-modal__close"
-					aria-label="<?php esc_attr_e( 'Close donation form', 'quickgive' ); ?>"
-					data-close="<?php echo esc_attr( $quickgive_uid ); ?>"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20" aria-hidden="true">
-						<line x1="18" y1="6" x2="6" y2="18"/>
-						<line x1="6" y1="6" x2="18" y2="18"/>
-					</svg>
+				<button type="button" class="quickdonate-modal__close" aria-label="<?php esc_attr_e( 'Close donation form', 'quickdonate' ); ?>" data-close="<?php echo esc_attr( $uid ); ?>">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 				</button>
 			</div>
 
-			<!-- Body -->
-			<div class="quickgive-modal__body">
-
-				<!-- Step 1: Choose amount -->
-				<div class="quickgive-step quickgive-step--amount" id="<?php echo esc_attr( $quickgive_uid . '-step-amount' ); ?>">
-					<p class="quickgive-label"><?php esc_html_e( 'Choose an amount', 'quickgive' ); ?></p>
-
-					<div class="quickgive-presets" id="<?php echo esc_attr( $quickgive_uid . '-presets' ); ?>" role="group" aria-label="<?php esc_attr_e( 'Preset donation amounts', 'quickgive' ); ?>">
-						<!-- Populated by JS from quickgiveConfig.presets -->
+			<div class="quickdonate-modal__body">
+				<div class="quickdonate-card quickdonate-card--form">
+					<div class="quickdonate-step">
+						<label class="quickdonate-label"><?php esc_html_e( 'Choose an amount', 'quickdonate' ); ?></label>
+						<div class="quickdonate-presets" id="<?php echo esc_attr( $uid . '-presets' ); ?>" role="group" aria-label="<?php esc_attr_e( 'Preset donation amounts', 'quickdonate' ); ?>"></div>
 					</div>
 
-					<?php if ( $quickgive_allow_custom ) : ?>
-					<div class="quickgive-custom" id="<?php echo esc_attr( $quickgive_uid . '-custom-wrap' ); ?>">
-						<label class="quickgive-label" for="<?php echo esc_attr( $quickgive_uid . '-custom' ); ?>">
-							<?php esc_html_e( 'Or enter custom amount', 'quickgive' ); ?>
-						</label>
-						<div class="quickgive-input-group">
-							<span class="quickgive-currency-badge"><?php echo esc_html( $quickgive_currency ); ?></span>
-							<input
-								type="number"
-								id="<?php echo esc_attr( $quickgive_uid . '-custom' ); ?>"
-								class="quickgive-input quickgive-input--amount"
-								min="1"
-								step="1"
-								placeholder="0"
-								aria-label="<?php esc_attr_e( 'Custom donation amount', 'quickgive' ); ?>"
-							/>
+					<?php if ( $allow_custom ) : ?>
+						<div class="quickdonate-step">
+							<label class="quickdonate-label" for="<?php echo esc_attr( $uid . '-custom' ); ?>"><?php esc_html_e( 'Or enter a custom amount', 'quickdonate' ); ?></label>
+							<div class="quickdonate-input-group">
+								<span class="quickdonate-currency"><?php echo esc_html( $currency ); ?></span>
+								<input type="number" id="<?php echo esc_attr( $uid . '-custom' ); ?>" class="quickdonate-input quickdonate-input--amount" min="1" step="1" placeholder="0" aria-label="<?php esc_attr_e( 'Custom donation amount', 'quickdonate' ); ?>" />
+							</div>
 						</div>
-					</div>
 					<?php endif; ?>
+
+					<div class="quickdonate-step">
+						<label class="quickdonate-label" for="<?php echo esc_attr( $uid . '-email' ); ?>"><?php esc_html_e( 'Your email address', 'quickdonate' ); ?></label>
+						<input type="email" id="<?php echo esc_attr( $uid . '-email' ); ?>" class="quickdonate-input quickdonate-input--email" placeholder="you@example.com" autocomplete="email" aria-required="true" />
+					</div>
+
+					<div class="quickdonate-alert" id="<?php echo esc_attr( $uid . '-alert' ); ?>" role="alert" aria-live="polite" hidden></div>
+
+					<div class="quickdonate-modal__footer">
+						<button
+							type="button"
+							class="quickdonate-submit-btn"
+							id="<?php echo esc_attr( $uid . '-submit' ); ?>"
+							data-instance="<?php echo esc_attr( $uid ); ?>"
+							data-email-id="<?php echo esc_attr( $uid . '-email' ); ?>"
+							data-alert-id="<?php echo esc_attr( $uid . '-alert' ); ?>"
+						>
+							<span class="quickdonate-submit-btn__text"><?php esc_html_e( 'Donate now', 'quickdonate' ); ?></span>
+							<span class="quickdonate-submit-btn__spinner" aria-hidden="true"></span>
+						</button>
+						<p class="quickdonate-secure-note">
+							<span class="quickdonate-secure-note__icon" aria-hidden="true">
+								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+							</span>
+							<?php esc_html_e( 'Secure checkout via Paystack', 'quickdonate' ); ?>
+						</p>
+					</div>
 				</div>
-
-				<!-- Step 2: Email -->
-				<div class="quickgive-step quickgive-step--email" id="<?php echo esc_attr( $quickgive_uid . '-step-email' ); ?>">
-					<label class="quickgive-label" for="<?php echo esc_attr( $quickgive_uid . '-email' ); ?>">
-						<?php esc_html_e( 'Your email address', 'quickgive' ); ?>
-					</label>
-					<input
-						type="email"
-						id="<?php echo esc_attr( $quickgive_uid . '-email' ); ?>"
-						class="quickgive-input quickgive-input--email"
-						placeholder="you@example.com"
-						autocomplete="email"
-						aria-required="true"
-					/>
-				</div>
-
-				<!-- Error / status message -->
-				<div class="quickgive-alert" id="<?php echo esc_attr( $quickgive_uid . '-alert' ); ?>" role="alert" aria-live="polite" hidden></div>
-
-				<!-- Footer -->
-				<div class="quickgive-modal__footer">
-					<button
-						type="button"
-						class="quickgive-submit-btn"
-						id="<?php echo esc_attr( $quickgive_uid . '-submit' ); ?>"
-						data-instance="<?php echo esc_attr( $quickgive_uid ); ?>"
-						data-email-id="<?php echo esc_attr( $quickgive_uid . '-email' ); ?>"
-						data-alert-id="<?php echo esc_attr( $quickgive_uid . '-alert' ); ?>"
-					>
-						<span class="quickgive-submit-btn__text">
-							<?php esc_html_e( 'Donate', 'quickgive' ); ?>
-						</span>
-						<span class="quickgive-submit-btn__spinner" aria-hidden="true"></span>
-					</button>
-					<p class="quickgive-secure-note" aria-label="<?php esc_attr_e( 'Secured by Paystack', 'quickgive' ); ?>">
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="13" height="13" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
-						<?php esc_html_e( 'Secured by Paystack', 'quickgive' ); ?>
-					</p>
-				</div>
-
-			</div><!-- /.quickgive-modal__body -->
-
-			<!-- Success Panel (hidden initially) -->
-			<div class="quickgive-success" id="<?php echo esc_attr( $quickgive_uid . '-success' ); ?>" hidden>
-				<div class="quickgive-success__icon" aria-hidden="true">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" fill="none" stroke-width="3">
-						<circle cx="26" cy="26" r="25" stroke="currentColor" fill="none"/>
-						<path stroke="currentColor" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-					</svg>
-				</div>
-				<h3 class="quickgive-success__heading"><?php esc_html_e( 'Thank You!', 'quickgive' ); ?></h3>
-				<div class="quickgive-success__message" id="<?php echo esc_attr( $quickgive_uid . '-thankyou' ); ?>"></div>
-				<button
-					type="button"
-					class="quickgive-success__close"
-					data-close="<?php echo esc_attr( $quickgive_uid ); ?>"
-				>
-					<?php esc_html_e( 'Close', 'quickgive' ); ?>
-				</button>
 			</div>
 
-		</div><!-- /.quickgive-modal -->
-	</div><!-- /.quickgive-overlay -->
-
-</div><!-- /.quickgive-wrap -->
+			<div class="quickdonate-success" id="<?php echo esc_attr( $uid . '-success' ); ?>" hidden>
+				<div class="quickdonate-success__icon" aria-hidden="true">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" fill="none" stroke-width="3"><circle cx="26" cy="26" r="25" stroke="currentColor" fill="none"/><path stroke="currentColor" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>
+				</div>
+				<h3 class="quickdonate-success__heading" tabindex="-1"><?php esc_html_e( 'Thank you', 'quickdonate' ); ?></h3>
+				<div class="quickdonate-success__message" id="<?php echo esc_attr( $uid . '-thankyou' ); ?>"></div>
+				<button type="button" class="quickdonate-success__close" data-close="<?php echo esc_attr( $uid ); ?>"><?php esc_html_e( 'Close', 'quickdonate' ); ?></button>
+			</div>
+		</div>
+	</div>
+</div>

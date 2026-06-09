@@ -1,23 +1,23 @@
-=== QuickGive ===
+=== QuickDonate ===
 Contributors: saif2002
-Tags: donations, paystack, fundraising, payment, charity
+Tags: donations, fundraising, paystack, charity, payments
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-QuickGive lets WordPress sites collect secure one-time donations through Paystack.
+Collect secure one-time donations with a clean popup checkout, donation logs, thank-you emails, and Paystack verification.
 
 == Description ==
 
-QuickGive is a simple WordPress donation plugin for accepting donations through Paystack. It provides an easy donation form, configurable donation amounts, donor information collection, and server-side payment verification.
+QuickDonate is a lightweight donation plugin for WordPress. It provides a shortcode-triggered popup, preset and custom donation amounts, donor email capture, server-side verification, donation logging, and optional thank-you emails.
 
-This first release supports Paystack only.
+The plugin is architected for future gateway expansion. Paystack is the first supported gateway and remains the only fully functional gateway in this release.
 
 **External service disclosure:**
-QuickGive connects to Paystack to process and verify payments. When a donor submits a donation, payment information is sent to Paystack for transaction processing. Site administrators must use their own Paystack public and secret keys.
+QuickDonate connects to Paystack to open checkout and verify completed transactions. Payment data required to process a donation is sent to Paystack. Site administrators must provide their own Paystack public and secret keys.
 
 Paystack Terms of Service:
 https://paystack.com/terms
@@ -27,54 +27,49 @@ https://paystack.com/privacy
 
 == Installation ==
 
-1. Upload the `quickgive` folder to the `/wp-content/plugins/` directory.
+1. Upload the `quickdonate` plugin folder to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the WordPress Plugins screen.
-3. Go to the QuickGive settings page.
-4. Enter your Paystack public key and secret key.
-5. Configure your donation amounts and currency.
-6. Add the donation shortcode to any page or post.
+3. Open `QuickDonate` in the WordPress admin.
+4. Configure your gateway keys, currency, donation amounts, and email settings.
+5. Add `[quickdonate_popup]` to any page or post.
 
 == Frequently Asked Questions ==
 
-= Does QuickGive support gateways other than Paystack? =
+= What shortcode should I use? =
 
-No. Version 1.0 supports Paystack only.
+Use `[quickdonate_popup]`.
 
-= Do I need a Paystack account? =
+Legacy aliases `[paystack_donation_popup]` and `[quickgive_donation_popup]` still work for backward compatibility.
 
-Yes. You need a Paystack account and API keys to receive payments.
+= Does QuickDonate support more than one gateway? =
 
-= Are Paystack keys included in the plugin? =
+The plugin is structured for multiple gateways, but this release only includes Paystack as a working gateway.
 
-No. Site administrators must add their own Paystack keys in the plugin settings.
+= Is payment verification done server-side? =
 
-= What shortcode do I use? =
+Yes. The transaction reference is verified on the server before a donation is marked as successful and before any thank-you email is sent.
 
-Add `[quickgive_donation_popup]` to any page or post to display the donation button.
+= Does the plugin support preset and custom amounts? =
 
-= Is the payment verification done server-side? =
+Yes. You can configure preset amounts and optionally allow donors to enter a custom amount.
 
-Yes. After a donor completes payment in the Paystack popup, the plugin verifies the transaction server-side using your secret key before recording it as successful. The secret key is never sent to the browser.
+= Does it work with Elementor layouts? =
 
-== Screenshots ==
-
-1. The donation button and popup modal displayed on the front end.
-2. The QuickGive settings page in the WordPress admin.
-3. The donation log showing all transactions.
+Yes. The modal overlay is moved to `document.body` to avoid being trapped inside Elementor containers with overflow or transform stacking contexts.
 
 == Changelog ==
 
-= 1.0 =
-* Initial release.
-* Added Paystack donation payment support.
-* Added donation form shortcode [quickgive_donation_popup].
-* Added admin settings for Paystack keys and donation configuration.
-* Added server-side transaction verification.
-* Added donation log in the WordPress admin.
-* Added configurable preset donation amounts and optional custom amount entry.
-* Added optional donor thank-you email after verified payment.
+= 1.2.0 =
+* Renamed the plugin from QuickGive to QuickDonate.
+* Added gateway abstraction with Paystack as the first supported gateway.
+* Added the new `[quickdonate_popup]` shortcode.
+* Kept backward-compatible support for `[paystack_donation_popup]` and `[quickgive_donation_popup]`.
+* Redesigned the admin settings, overview, and donation log pages.
+* Redesigned the frontend donation popup and button styles.
+* Fixed Elementor modal containment by relocating overlays to `document.body`.
+* Added gateway tracking to donation logs and summary views.
 
 == Upgrade Notice ==
 
-= 1.0 =
-Initial release.
+= 1.2.0 =
+QuickDonate automatically migrates legacy settings from `quickgive_settings` and upgrades legacy donation tables where needed.
